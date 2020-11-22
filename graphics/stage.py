@@ -4,6 +4,7 @@ import pyglet
 class Stage:
 
     def __init__(self, screen_width, screen_height, gen, size, window):
+        self.started = False
         self.__window = window
         self._gen = gen
         self.size = size
@@ -32,6 +33,7 @@ class Stage:
 
     def start(self):
         pyglet.clock.schedule_interval(self.update, 1 / self.speed)
+        self.started = True
 
     def get_draw_data(self, array):
         temp_list = []
