@@ -18,18 +18,13 @@ class Stage:
         self.speed = 144
 
     def update(self, dt):
-        if self.frame < len(self.frames):
+        try:
             self.__window.clear()
-            pyglet.graphics.draw(self.size * 4, pyglet.gl.GL_QUADS, self.frames[self.frame])
-            self.frame += 1
-        else:
+            array = next(self._gen)
+            frame = self.get_draw_data(array)
+            pyglet.graphics.draw(self.size * 4, pyglet.gl.GL_QUADS, frame)
+        except StopIteration:
             pyglet.clock.unschedule(self.update)
-
-    def prepare_frames(self):
-        for array in self._gen:
-            self.frames.append(self.get_draw_data(array))
-        # duplicate last frame to ensure that engine won't redraw last two screens when idling (SwapBuffers)
-        self.frames.append(self.frames[-1])
 
     def start(self):
         pyglet.clock.schedule_interval(self.update, 1 / self.speed)
