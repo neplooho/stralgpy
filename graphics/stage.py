@@ -1,9 +1,10 @@
+import datetime
 import pyglet
 
 
 class Stage:
 
-    def __init__(self, screen_width, screen_height, gen, size, window):
+    def __init__(self, screen_width, screen_height, gen, size, window, speed=144):
         self.started = False
         self.__window = window
         self._gen = gen
@@ -15,7 +16,8 @@ class Stage:
         self.y = 5
         self.frames = []
         self.frame = 0
-        self.speed = 144
+        self.speed = speed
+        self.startTime = None
 
     def update(self, dt):
         try:
@@ -25,10 +27,13 @@ class Stage:
             pyglet.graphics.draw(self.size * 4, pyglet.gl.GL_QUADS, frame)
         except StopIteration:
             pyglet.clock.unschedule(self.update)
+            elapsed = datetime.datetime.now() - self.startTime
+            print("Took {} time to finish.".format(elapsed))
 
     def start(self):
         pyglet.clock.schedule_interval(self.update, 1 / self.speed)
         self.started = True
+        self.startTime = datetime.datetime.now()
 
     def get_draw_data(self, array):
         temp_list = []
@@ -42,3 +47,8 @@ class Stage:
             temp_list.append(self.x + (self.width * i) + self.step)
             temp_list.append(array[i] * self.height_mult + self.y)
         return 'v2f', tuple(temp_list)
+
+    def multiplySpeed(self, multiplier):
+        self.speed *= multiplier
+        pyglet.clock.unschedule(self.update)
+        pyglet.clock.schedule_interval(self.update, 1 / self.speed)
